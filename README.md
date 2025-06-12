@@ -1,2 +1,2 @@
-# equityag_materials
-Repository for Storing EquityAg Summer Materials
+# Repository for Storing EquityAg Summer Materials
+
