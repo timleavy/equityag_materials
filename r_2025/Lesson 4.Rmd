@@ -1,0 +1,197 @@
+---
+title: "Lesson 3: Variables, Transformations, and Robustness in Regression"
+author: "Anna Josephson"
+date: "2025-06-23"
+output: html_document
+---
+
+## Learning Objectives
+
+By the end of this lesson, you should be able to:
+
+1. Distinguish between types of variables and understand when to use each.
+2. Understand the role of error distributions in regression.
+3. Know when to use mean vs. median and why that matters.
+4. Recognize why and when transformations like standardization or logs are appropriate.
+5. Understand situations where OLS may be insufficient.
+6. Explain what robustness checks are and why we do them.
+
+---
+
+## Part 1: Understanding Variables
+
+In economics, variables are how we measure the world. Choosing the right type of variable affects your models and interpretation.
+
+### Types of Variables
+
+- **Categorical Variables**
+  - Represent categories or groups
+  - Example: Gender (Male, Female), Region (North, South)
+  - Use in regression: Convert to dummy variables (0/1)
+
+```r
+region <- factor(c("North", "South", "North", "South"))
+dummies <- model.matrix(~ region)[, -1]  # Creates dummy variables
+```
+
+- **Ordinal Variables**
+  - Categories with a meaningful order
+  - Example: Education level (High school < College < Graduate)
+  - Use: Sometimes treated as numeric, but caution is needed - can you give an example of why this might be? 
+
+```r
+education <- ordered(c("High school", "College", "Graduate"),
+                     levels = c("High school", "College", "Graduate"))
+```
+
+- **Likert-scale Variables**
+  - A special case of ordinal variables
+  - Example: Agreement levels (Strongly Disagree to Strongly Agree)
+  - Use: Often treated as numeric in practice, but interpretation must consider ordering
+
+```r
+likert <- ordered(c("Disagree", "Neutral", "Agree", "Strongly Agree"),
+                  levels = c("Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"))
+```
+
+- **Continuous Variables**
+  - Numeric and can take any value within a range
+
+```r
+income <- c(32000, 45000, 51000, 39000)
+```
+
+- **Binary Variables**
+  - Only two outcomes (0 or 1)
+
+```r
+employed <- c(1, 0, 1, 1)
+```
+
+---
+
+## Part 2: Distributions and Error Terms
+
+### Why Error Distribution Matters
+
+OLS assumes errors are normally distributed, independent, and homoskedastic.
+
+You can visualize errors using a histogram:
+
+```r
+model <- lm(mpg ~ wt, data = mtcars)
+residuals <- residuals(model)
+hist(residuals, breaks = 10, main = "Histogram of Residuals")
+```
+
+### Mean vs. Median in Regression
+
+- **OLS** (mean-based):
+
+```r
+ols_model <- lm(mpg ~ wt, data = mtcars)
+summary(ols_model)
+```
+
+- **Median Regression** (quantile regression):
+
+```r
+install.packages("quantreg")
+library(quantreg)
+median_model <- rq(mpg ~ wt, data = mtcars, tau = 0.5)
+summary(median_model)
+```
+
+---
+
+## Part 3: Transforming Variables
+
+### Standardization
+
+```r
+mtcars$wt_std <- scale(mtcars$wt)
+```
+
+### Taking Logs
+
+```r
+mtcars$log_wt <- log(mtcars$wt)
+```
+
+If your variable has zeros:
+
+```r
+mtcars$log_wt_safe <- log(mtcars$wt + 1)
+```
+
+---
+
+## Part 4: When OLS Isn’t Enough
+
+### Nonlinear Relationships
+
+```r
+model_quad <- lm(mpg ~ wt + I(wt^2), data = mtcars)
+summary(model_quad)
+```
+
+### Heteroskedasticity
+
+```r
+install.packages("sandwich")
+library(sandwich)
+coeftest(model, vcov = vcovHC(model, type = "HC1"))
+```
+
+### Logistic Regression
+
+```r
+mtcars$high_mpg <- ifelse(mtcars$mpg > 20, 1, 0)
+logit_model <- glm(high_mpg ~ wt, data = mtcars, family = binomial)
+summary(logit_model)
+```
+
+---
+
+## Part 5: Robustness Checks
+
+### Try Different Specifications
+
+```r
+model_alt <- lm(mpg ~ wt + hp, data = mtcars)
+summary(model_alt)
+```
+
+### Try with and without an outlier
+
+```r
+model_no_outlier <- lm(mpg ~ wt, data = mtcars[-which.max(mtcars$wt), ])
+summary(model_no_outlier)
+```
+
+### Try Different Estimators
+
+```r
+# Already shown: quantile regression, robust SE
+```
+
+---
+
+## Let's Practice
+
+1. Create different variable types using `factor()`, `ordered()`, and `numeric`.
+2. Plot with `hist()`, `boxplot()`, and compare `mean()` vs `median()`.
+3. Apply `log()` and `scale()` to transform data.
+4. Run `lm()` and then try adding a quadratic term: `I(x^2)`.
+5. Use `vcovHC()` for robust SE, `rq()` for median regression.
+6. Discuss a robustness check you would run.
+
+---
+
+## Reflect and Extend
+
+- Why is it dangerous to treat all variables the same way?
+- What are the trade-offs between simplicity (OLS) and complexity (nonlinear models)?
+- What other robustness checks could you imagine using?
+
+This lesson gives you the building blocks to move from "just running a regression" to **thinking critically about what your model is doing.**
