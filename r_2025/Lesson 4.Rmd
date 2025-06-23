@@ -63,6 +63,7 @@ income <- c(32000, 45000, 51000, 39000)
 
 - **Binary Variables**
   - Only two outcomes (0 or 1)
+  - A course, but often essential, measure 
 
 ```r
 employed <- c(1, 0, 1, 1)
