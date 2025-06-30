@@ -1,9 +1,40 @@
 ---
-title: "Lesson 4: Variables, Transformations, and Robustness in Regression"
+title: "Lesson 3: Variables, Transformations, and Robustness in Regression"
 author: "Anna Josephson"
 date: "2025-06-23"
 output: html_document
 ---
+
+## Package Used
+
+A package is a collection of R functions and datasets designed to make certain tasks easier. You need to install and load a package before using it.
+
+- **Base R**
+We also used several functions that are part of base R (which means you don’t need to install or load any extra packages). These include:
+  - `lm()` – fits a linear regression model
+  -`residuals()` – returns model residuals (prediction errors)
+  - `hist()` – creates a histogram to visualize distributions
+  - `plot()` – draws basic plots, like scatterplots or residuals
+  - `log()` / `log10()` – applies logarithmic transformation
+  - `scale()` – standardizes variables (mean = 0, SD = 1)
+  - `ifelse()` – creates binary (0/1) variables
+  - `which.max()` – finds the position of the maximum value
+  - `data.frame()` – creates a data table
+  - `factor()` / `ordered()` – defines categorical and ordinal variables
+  - `summary()` – provides model output and basic descriptive statistics
+
+
+- `quantreg`
+Used for quantile regression, which estimates the median (or other percentiles) instead of the mean. Helpful when your data has outliers or is skewed.
+  - `rq()` – runs a quantile regression (e.g., median regression)
+
+- `sandwich`
+Provides tools for computing robust standard errors, which protect against problems like heteroskedasticity (non-constant variance of residuals).
+  - `vcovHC()` – calculates heteroskedasticity-consistent (robust) variance-covariance matrix
+
+- `ggplot2`
+A package for data visualization. It lets you make elegant, customizable charts and graphs.
+
 
 ## Learning Objectives
 
@@ -28,6 +59,8 @@ In economics, variables are how we measure the world. Choosing the right type of
   - Represent categories or groups
   - Example: Gender (Male, Female), Region (North, South)
   - Use in regression: Convert to dummy variables (0/1)
+  - In R: Use `factor()` to turn them into categories.
+
 
 ```r
 region <- factor(c("North", "South", "North", "South"))
@@ -37,12 +70,16 @@ dummies <- model.matrix(~ region)[, -1]  # Creates dummy variables
 - **Ordinal Variables**
   - Categories with a meaningful order
   - Example: Education level (High school < College < Graduate)
+  - In R: Use `ordered()` to capture this ranking.
   - Use: Sometimes treated as numeric, but caution is needed - can you give an example of why this might be? 
 
 ```r
 education <- ordered(c("High school", "College", "Graduate"),
                      levels = c("High school", "College", "Graduate"))
 ```
+
+Important: Just because they have an order doesn't mean they behave like numbers. For example, the "gap" between High school and College isn't necessarily the same as College to Graduate.
+
 
 - **Likert-scale Variables**
   - A special case of ordinal variables
@@ -54,8 +91,10 @@ likert <- ordered(c("Disagree", "Neutral", "Agree", "Strongly Agree"),
                   levels = c("Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"))
 ```
 
+
 - **Continuous Variables**
   - Numeric and can take any value within a range
+  - Example: Income, Age, Height.
 
 ```r
 income <- c(32000, 45000, 51000, 39000)
@@ -69,15 +108,24 @@ income <- c(32000, 45000, 51000, 39000)
 employed <- c(1, 0, 1, 1)
 ```
 
+Binary variables are super useful in modeling (like "Did someone graduate?")
+They let us ask clear yes/no questions in our data.
+
 ---
 
 ## Part 2: Distributions and Error Terms
 
 ### Why Error Distribution Matters
 
-OLS assumes errors are normally distributed, independent, and homoskedastic.
+When you run a regression, the model can’t predict perfectly. The difference between what the model predicts and the actual value is called the error or residual.
 
-You can visualize errors using a histogram:
+OLS = Ordinary Least Squares (standard linear regression). Assumes:
+
+Errors are normally distributed
+
+Errors have constant variance (this is called homoskedasticity)
+
+You can visualize errors like this:
 
 ```r
 model <- lm(mpg ~ wt, data = mtcars)
@@ -85,7 +133,66 @@ residuals <- residuals(model)
 hist(residuals, breaks = 10, main = "Histogram of Residuals")
 ```
 
+This helps check if your errors follow a nice bell-shaped curve (normal distribution).
+
+#### ** A Bit More on Error and Standard Errors (SE) **
+
+**Residuals vs. Standard Errors**
+
+
+- Residuals: The difference between your model’s prediction and the actual value for each data point.
+  - These tell you how well your model fits each observation.
+  -You can plot them to check patterns or problems (e.g., nonlinearity, heteroskedasticity).
+
+- Standard Error: Measures the precision of your coefficient estimates.
+  - A smaller SE means more confidence in your estimate.
+  - SE is used to calculate confidence intervals and p-values in model summaries.
+
+**Example**:
+
+If your model says `b = -5` with `SE = 1.2`, that’s a pretty precise estimate.
+
+But if `SE = 4.9`, it’s harder to be confident the effect is real.
+
+
+**What Affects Standard Errors?**
+
+Sample size: More data → smaller SE
+
+Variance of the residuals: More noisy data → larger SE
+
+Multicollinearity (when predictors are highly correlated): Inflates SE
+
+
+**Visualizing SE: Confidence Intervals**
+
+Try plotting a model with ggplot2 to visualize standard error bands:
+
+```r
+library(ggplot2)
+
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE)
+
+```
+
+The shaded band is the confidence interval around the regression line, based on standard error. If it’s wide, your predictions are less certain.
+
+**Why Does This Matter?**
+
+Understanding SE helps you avoid overconfidence in your results.
+
+You may have a big coefficient — but is it statistically different from zero?
+
+A coefficient isn’t “real” just because it’s large; it must also be precise.
+
+
+
 ### Mean vs. Median in Regression
+
+  - **Mean** is affected by outliers (like one really rich person skewing income).
+  - **Median** is more stable if your data has extreme values.
 
 - **OLS** (mean-based):
 
@@ -107,19 +214,119 @@ summary(median_model)
 
 ## Part 3: Transforming Variables
 
+Sometimes your raw data isn't ideal for analysis. Transformation helps:
+
+- Improve model accuracy
+
+- Make patterns easier to see
+
+- Make variables more comparable
+
+- Handle skewed or extreme data
+
+We’ll focus on two common transformations:
+
+1. Standarization
+
+2. Log Transformation
+
 ### Standardization
+
+What it does:
+Standardization scales your data so:
+
+- Mean = 0
+
+- Standard deviation = 1
+
+This makes values comparable, especially when your dataset contains variables that are:
+
+- On different scales (e.g., age in years vs. income in dollars)
+
+- Used in models together
+
+**Example**:
+
+You have two variables:
+
+`income` (in dollars): e.g., 32,000; 75,000; 110,000
+
+`education_years`: e.g., 12; 16; 18
+
+If you put both into a model, income will dominate because it’s measured in bigger units.
+
+Fix by standardizing:
+
+```r
+df$income_std <- scale(df$income)
+df$education_std <- scale(df$education_years)
+```
+Now both are on the same unitless scale (Z-scores), and your regression treats them fairly.
+
+When to standardize:
+
+- When combining different units (e.g. height, weight, dollars)
+
+- Before using algorithms that are sensitive to scale (e.g., clustering, regression)
+
+- To improve model interpretability
+
+Let's do it:
 
 ```r
 mtcars$wt_std <- scale(mtcars$wt)
 ```
 
-### Taking Logs
+
+
+### Log transformation
+
+What it does:
+It compresses large numbers while keeping their order.
+
+Helps when some values are huge and others are tiny.
+
+Turns multiplicative relationships into additive ones (very helpful in modeling).
+
+**Example**: 
+
+Imagine you're analyzing population by region, and you make a barplot:
+
+```r
+population <- c(800, 1200, 50000, 600, 90000)
+barplot(population, names.arg = c("A", "B", "C", "D", "E"))
+``` 
+
+This plot will be hard to read because:
+
+One or two bars are so big, the others look flat.
+
+The difference between counties or cities is too extreme.
+
+Fix with a log transformation:
+
+```r
+log_pop <- log10(population)
+barplot(log_pop, names.arg = c("A", "B", "C", "D", "E"))
+```
+Now the bars are more evenly scaled, and patterns become easier to compare.
+
+When to use log transformation:
+
+- Economic data: income, GDP, population
+
+- Health data: hospital bills, medical cases
+
+- Any data with large ranges
+
+So, let's do that for our data:
 
 ```r
 mtcars$log_wt <- log(mtcars$wt)
 ```
 
-If your variable has zeros:
+
+If your data has zeros, use:
 
 ```r
 mtcars$log_wt_safe <- log(mtcars$wt + 1)
@@ -129,14 +336,62 @@ mtcars$log_wt_safe <- log(mtcars$wt + 1)
 
 ## Part 4: When OLS Isn’t Enough
 
-### Nonlinear Relationships
+OLS: 
+
+- Finds a line that minimizes squared errors
+
+- Assumes a linear relationship
+
+- Assumes errors are evenly spread (homoskedastic)
+
+But real-world data isn’t always this clean. Let’s see why you might need more than OLS.
+
+### 1. Nonlinear Relationships
+
+Imagine you plot weight vs. fuel efficiency (MPG):
+
+
+```r
+plot(mtcars$wt, mtcars$mpg)
+```
+
+You might see a curve, not a straight line.
+
+OLS assumes a line like this:
+
+
+```r
+mpg = a + b*wt
+```
+
+But if the data curves, the model misses the pattern.
+
+Fix with a quadratic term:
 
 ```r
 model_quad <- lm(mpg ~ wt + I(wt^2), data = mtcars)
 summary(model_quad)
 ```
 
-### Heteroskedasticity
+This lets the line bend (a parabola). It now fits your data better.
+
+### 2. Heteroskedasticity (Unequal Spread of Errors)
+
+OLS assumes that errors (residuals) have the same size all across your data.
+
+**Problem**:
+
+In a scatterplot of residuals, maybe the points spread out as x increases.
+
+
+```r
+plot(model$fitted.values, model$residuals)
+```
+
+If the plot shows a fan shape, your model has heteroskedasticity.
+
+Fix with robust standard errors:
+
 
 ```r
 install.packages("sandwich")
@@ -144,7 +399,14 @@ library(sandwich)
 coeftest(model, vcov = vcovHC(model, type = "HC1"))
 ```
 
-### Logistic Regression
+This adjusts your confidence in the estimates without changing the model.
+
+
+
+### 3. Binary Outcomes: Use Logistic Regression
+
+If your variable is yes/no (e.g., passed = 1, failed = 0), OLS isn’t right.
+
 
 ```r
 mtcars$high_mpg <- ifelse(mtcars$mpg > 20, 1, 0)
@@ -152,9 +414,22 @@ logit_model <- glm(high_mpg ~ wt, data = mtcars, family = binomial)
 summary(logit_model)
 ```
 
+OLS might predict -0.2 or 1.3 — but you can't have 130% or -20% success.
+
+Use logistic regression:
+
+```r
+logit_model <- glm(high_mpg ~ wt, data = mtcars, family = binomial)
+summary(logit_model)
+```
+
+Now predictions are between 0 and 1 — perfect for probabilities.
+
 ---
 
 ## Part 5: Robustness Checks
+
+In econometrics, robustness checks help us test whether our results are reliable or sensitive to certain assumptions. We want to make sure our findings aren't just a fluke of the specific way we ran the model.
 
 ### Try Different Specifications
 
@@ -163,6 +438,18 @@ model_alt <- lm(mpg ~ wt + hp, data = mtcars)
 summary(model_alt)
 ```
 
+**What's happening here?**
+
+- `lm()` is a function in R that stands for linear model.
+
+- `mpg ~ wt + hp` means we are predicting miles per gallon (`mpg`) using weight (`wt`) and horsepower (´hp´).
+
+- `data = mtcars´ means we are using the built-in `mtcars` dataset.
+
+**Why are we doing this?**
+
+We're trying a different specification of the model. Originally, we might have used just `wt` to predict `mpg`. Now, we’re adding hp to see if that changes the results. This helps test if the model is sensitive to what variables we include.
+
 ### Try with and without an outlier
 
 ```r
@@ -170,11 +457,42 @@ model_no_outlier <- lm(mpg ~ wt, data = mtcars[-which.max(mtcars$wt), ])
 summary(model_no_outlier)
 ```
 
+**What's happening here?**
+
+- `which.max(mtcars$wt)` finds the row with the highest weight — that's likely an outlier (an extreme value).
+
+- `mtcars[-which.max(mtcars$wt), ]` removes that row from the data.
+
+- Then we run the same model: predicting ´mpg´ using ´wt´.
+
+**Why do this?**
+
+Outliers can distort the results of a regression. This check tells us: “Does removing the most extreme car (in terms of weight) change our conclusions?”
+
 ### Try Different Estimators
 
 ```r
 # Already shown: quantile regression, robust SE
 ```
+
+**What does this mean?**
+
+Instead of just using regular linear regression (`lm()`), we might try:
+
+- **Quantile regression**: Focuses on the median or other quantiles instead of the average.
+
+- **Robust standard errors**: Adjusts for issues like unequal variability in the data (heteroskedasticity).
+
+These are **alternative methods** to see if the main message from your model still holds.
+
+
+#### **Big Picture**
+
+Each of these steps asks:
+
+"If I change the way I run my model a little, do I still get the same general story?"
+
+If the answer is yes, your model is robust — a good sign.
 
 ---
 
