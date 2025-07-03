@@ -4,6 +4,45 @@ author: "Anna Josephson"
 date: "2025-06-10"
 output: html_document
 ---
+## Glossary of Git Terms
+
+When working on coding projects—especially in teams—it’s important to keep track of changes and collaborate effectively. That’s where tools like Git and GitHub come in.
+
+This glossary is designed to help you understand the key terms used when working with Git and GitHub, particularly in combination with RStudio. Whether you're managing your own project or collaborating with others, these definitions will give you a solid foundation in version control and help you navigate your workflow with more confidence.
+
+- `Git` is a version control system. It helps you track changes in your code and makes it easier to collaborate with others. Think of it like “track changes” in Microsoft Word, but specifically designed for code and projects.
+
+- `GitHub` is a website where you can store Git repositories online. It allows you to collaborate with others, share code, and manage projects. While Git runs on your computer, GitHub hosts your work in the cloud.
+
+- A `Repository` (Repo) is a folder that Git is tracking. It contains all your project files and a history of every change you've made. Repositories can live on your computer (local) or on GitHub (remote).
+
+- A `commit` is like taking a snapshot of your project at a certain point in time. It saves your changes with a short message describing what you did (like “Fix typo” or “Add plot to script”).
+
+- Before you commit, you **“stage”** changes — this means selecting which files or changes you want to include in your next commit. In RStudio, this is done by checking a box in the Git tab.
+
+- `Push` Pushing means sending your local commits (saved changes) to GitHub, so others can see your work or collaborate with you.
+
+- `Pull` Pulling gets the latest changes from GitHub to your computer. This is important to do before you start working, especially if others are also contributing to the same project.
+
+- `Clone` Cloning means making a copy of a GitHub repository on your local computer. You usually clone a repo when you're starting to work on a project that’s already on GitHub.
+
+- A `Branch` is a separate version of your project. You can use branches to try out new ideas or features without affecting the main project. Once the branch is ready, it can be merged back in.
+
+- `Merge` Merging combines changes from one branch into another. It’s most commonly used to bring your feature work into the main branch after it’s been tested.
+
+- A **merge conflict** happens when two people change the same part of a file in different ways. Git doesn’t know which change to keep, so it asks you to resolve the conflict manually.
+
+- A `README` is a text file (usually written in Markdown) that introduces and explains your project. It’s usually the first thing someone sees when they visit your GitHub repo.
+
+
+- The `.gitignore` file tells Git to ignore certain files or folders — for example, files that are too big or not relevant to the project (like temporary files or datasets over 100 MB).
+
+- A **Remote** is the version of your repository that lives on GitHub. Your computer holds the local copy. You sync changes between the two by pushing and pulling.
+
+- **Origin** is the default name Git gives to your remote GitHub repository. When you push or pull, you're usually doing it to/from “origin”.
+
+
+- **Main** is the name of the default branch in a repository. It used to be called "master" but was renamed to be more inclusive. It’s where the stable, finished version of your project usually lives.
 
 ## Learning Objectives
 
