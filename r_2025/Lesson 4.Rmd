@@ -9,6 +9,9 @@ output: html_document
 
 A package is a collection of R functions and datasets designed to make certain tasks easier. You need to install and load a package before using it.
 
+- `arrow`
+A package that allows R to read and write data in Parquet format, which is a fast and compact way to store data.
+
 - **Base R**
 We also used several functions that are part of base R (which means you don’t need to install or load any extra packages). These include:
   - `lm()` – fits a linear regression model
@@ -23,6 +26,9 @@ We also used several functions that are part of base R (which means you don’t 
   - `factor()` / `ordered()` – defines categorical and ordinal variables
   - `summary()` – provides model output and basic descriptive statistics
 
+- `mtcars` 
+
+A built-in R dataset containing fuel consumption and design specifications for 32 car models from the 1970s. Commonly used for teaching regression and data analysis.
 
 - `quantreg`
 Used for quantile regression, which estimates the median (or other percentiles) instead of the mean. Helpful when your data has outliers or is skewed.
@@ -49,6 +55,7 @@ By the end of this lesson, you should be able to:
 
 ---
 
+
 ## Part 1: Understanding Variables
 
 In economics, variables are how we measure the world. Choosing the right type of variable affects your models and interpretation.
@@ -62,7 +69,7 @@ In economics, variables are how we measure the world. Choosing the right type of
   - In R: Use `factor()` to turn them into categories.
 
 
-```r
+```{r 1}
 region <- factor(c("North", "South", "North", "South"))
 dummies <- model.matrix(~ region)[, -1]  # Creates dummy variables
 ```
@@ -73,7 +80,7 @@ dummies <- model.matrix(~ region)[, -1]  # Creates dummy variables
   - In R: Use `ordered()` to capture this ranking.
   - Use: Sometimes treated as numeric, but caution is needed - can you give an example of why this might be? 
 
-```r
+```{r 2}
 education <- ordered(c("High school", "College", "Graduate"),
                      levels = c("High school", "College", "Graduate"))
 ```
@@ -86,7 +93,7 @@ Important: Just because they have an order doesn't mean they behave like numbers
   - Example: Agreement levels (Strongly Disagree to Strongly Agree)
   - Use: Often treated as numeric in practice, but interpretation must consider ordering
 
-```r
+```{r 3}
 likert <- ordered(c("Disagree", "Neutral", "Agree", "Strongly Agree"),
                   levels = c("Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"))
 ```
@@ -96,7 +103,7 @@ likert <- ordered(c("Disagree", "Neutral", "Agree", "Strongly Agree"),
   - Numeric and can take any value within a range
   - Example: Income, Age, Height.
 
-```r
+```{r 4}
 income <- c(32000, 45000, 51000, 39000)
 ```
 
@@ -104,7 +111,7 @@ income <- c(32000, 45000, 51000, 39000)
   - Only two outcomes (0 or 1)
   - A course, but often essential, measure 
 
-```r
+```{r 5}
 employed <- c(1, 0, 1, 1)
 ```
 
@@ -114,6 +121,47 @@ They let us ask clear yes/no questions in our data.
 ---
 
 ## Part 2: Distributions and Error Terms
+
+### About the `mtcars` Dataset
+
+The `mtcars` dataset is a built-in dataset in R that contains data about fuel consumption and design aspects of 32 different car models from the 1970s. It includes variables such as miles per gallon (`mpg`), number of cylinders (`cyl`), horsepower (`hp`), weight (`wt`), and others. This dataset is often used for demonstrating statistical methods, especially linear regression.
+
+Variables in mtcars:
+
+- `mpg`
+Miles per gallon – a measure of fuel efficiency.
+
+- `cyl`
+Number of cylinders in the engine (usually 4, 6, or 8).
+
+- `disp`
+Displacement – engine size in cubic inches.
+
+- `hp`
+Gross horsepower – engine power output.
+
+- `drat`
+Rear axle ratio – affects engine performance.
+
+- `wt`
+Weight of the car (in 1,000 lbs).
+
+- `qsec`
+Quarter-mile time – time (in seconds) to travel 1/4 mile from a standstill.
+
+- `vs`
+Engine shape: 0 = V-shaped, 1 = straight (in-line).
+
+- `am`
+Transmission: 0 = automatic, 1 = manual.
+
+- `gear`
+Number of forward gears.
+
+- `carb`
+Number of carburetors.
+
+
 
 ### Why Error Distribution Matters
 
@@ -127,7 +175,7 @@ Errors have constant variance (this is called homoskedasticity)
 
 You can visualize errors like this:
 
-```r
+```{r 6}
 model <- lm(mpg ~ wt, data = mtcars)
 residuals <- residuals(model)
 hist(residuals, breaks = 10, main = "Histogram of Residuals")
@@ -168,7 +216,7 @@ Multicollinearity (when predictors are highly correlated): Inflates SE
 
 Try plotting a model with ggplot2 to visualize standard error bands:
 
-```r
+```{r 7}
 library(ggplot2)
 
 ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -196,15 +244,15 @@ A coefficient isn’t “real” just because it’s large; it must also be prec
 
 - **OLS** (mean-based):
 
-```r
+```{r 8}
 ols_model <- lm(mpg ~ wt, data = mtcars)
 summary(ols_model)
 ```
 
 - **Median Regression** (quantile regression):
 
-```r
-install.packages("quantreg")
+```{r 9}
+install.packages("quantreg", repos = "https://cloud.r-project.org/")
 library(quantreg)
 median_model <- rq(mpg ~ wt, data = mtcars, tau = 0.5)
 summary(median_model)
@@ -249,18 +297,24 @@ This makes values comparable, especially when your dataset contains variables th
 
 You have two variables:
 
-`income` (in dollars): e.g., 32,000; 75,000; 110,000
+`income` (in dollars): e.g., 32000; 45000; 51000; 39000
 
-`education_years`: e.g., 12; 16; 18
+`education_years`: e.g., 12; 16; 18; 14
 
 If you put both into a model, income will dominate because it’s measured in bigger units.
 
 Fix by standardizing:
 
-```r
+```{r 10}
+
+df <- data.frame(
+  income = c(32000, 45000, 51000, 39000),
+  education_years = c(12, 16, 18, 14))
+
 df$income_std <- scale(df$income)
 df$education_std <- scale(df$education_years)
 ```
+
 Now both are on the same unitless scale (Z-scores), and your regression treats them fairly.
 
 When to standardize:
@@ -273,15 +327,24 @@ When to standardize:
 
 Let's do it:
 
-```r
+```{r 11}
 mtcars$wt_std <- scale(mtcars$wt)
 ```
 
+Also, this line of code standardizes the `wt` variable in the `mtcars` dataset and saves it as a new column called `wt_std`.
+
+- `wt` stands for weight of the car, measured in 1,000 pounds.
+
+- `scale(mtcars$wt)` transforms the values into Z-scores: it subtracts the mean and divides by the standard deviation.
+
+- The result is a standardized version of car weight, with a mean of 0 and standard deviation of 1.
+
+This allows you to compare wt fairly with other variables on different scales or include it in a regression model without it dominating due to larger numeric values.
 
 
 ### Log transformation
 
-What it does:
+**What it does**:
 It compresses large numbers while keeping their order.
 
 Helps when some values are huge and others are tiny.
@@ -292,7 +355,7 @@ Turns multiplicative relationships into additive ones (very helpful in modeling)
 
 Imagine you're analyzing population by region, and you make a barplot:
 
-```r
+```{r 12}
 population <- c(800, 1200, 50000, 600, 90000)
 barplot(population, names.arg = c("A", "B", "C", "D", "E"))
 ``` 
@@ -305,7 +368,7 @@ The difference between counties or cities is too extreme.
 
 Fix with a log transformation:
 
-```r
+```{r 13}
 log_pop <- log10(population)
 barplot(log_pop, names.arg = c("A", "B", "C", "D", "E"))
 ```
@@ -321,16 +384,26 @@ When to use log transformation:
 
 So, let's do that for our data:
 
-```r
+```{r 14}
 mtcars$log_wt <- log(mtcars$wt)
 ```
 
 
 If your data has zeros, use:
 
-```r
+```{r 15}
 mtcars$log_wt_safe <- log(mtcars$wt + 1)
 ```
+
+This line creates a new variable + `log_wt_safe` by applying the natural logarithm to `wt + 1`.
+
+- Adding 1 before taking the log is a common trick to handle zeros or very small values in your data because `log(0)` is undefined (it causes an error).
+
+- Although `mtcars$wt` doesn’t have zeros, this approach is useful when your variable may contain zero values.
+
+- This ensures the logarithm transformation won’t fail and keeps all values positive before transformation.
+
+
 
 ---
 
@@ -351,7 +424,7 @@ But real-world data isn’t always this clean. Let’s see why you might need mo
 Imagine you plot weight vs. fuel efficiency (MPG):
 
 
-```r
+```{r 16}
 plot(mtcars$wt, mtcars$mpg)
 ```
 
@@ -368,7 +441,7 @@ But if the data curves, the model misses the pattern.
 
 Fix with a quadratic term:
 
-```r
+```{r 17}
 model_quad <- lm(mpg ~ wt + I(wt^2), data = mtcars)
 summary(model_quad)
 ```
@@ -381,21 +454,47 @@ OLS assumes that errors (residuals) have the same size all across your data.
 
 **Problem**:
 
-In a scatterplot of residuals, maybe the points spread out as x increases.
+In a scatterplot of residuals, maybe the points spread out as x increases. For this, we need the residuals and the fitted values of the model. 
 
 
-```r
+```r {r 18}
+# Fit a simple linear regression model
+model <- lm(mpg ~ wt, data = mtcars)
+
+# Extract residuals and fitted values from the model
+residuals <- residuals(model)
+fitted_values <- fitted(model)
+```
+
+Plot residuals vs. fitted values to check for heteroskedasticity
+
+```{r 19}
 plot(model$fitted.values, model$residuals)
 ```
 
 If the plot shows a fan shape, your model has heteroskedasticity.
 
+**What this code does**:
+
+Fits a linear regression model predicting miles per gallon (`mpg`) based on car weight (`wt`) using the built-in mtcars dataset.
+
+Extracts residuals (the differences between observed and predicted values) and fitted values (the predicted `mpg` values).
+
+Plots residuals against fitted values to visually inspect whether the spread of residuals is constant across all predicted values.
+
+OLS regression assumes that residuals have constant variance (called homoskedasticity). If the residuals fan out or get larger/smaller as fitted values increase, this indicates heteroskedasticity, meaning the error variance changes and OLS assumptions are violated.
+
+By looking at this plot, you can get a quick visual check if your model meets this assumption or if you need more advanced techniques.
+
+
 Fix with robust standard errors:
 
 
-```r
-install.packages("sandwich")
+```{r 20}
+install.packages("sandwich", repos = "https://cloud.r-project.org/")
+install.packages("lmtest", repos = "https://cloud.r-project.org/")
 library(sandwich)
+library(lmtest)
 coeftest(model, vcov = vcovHC(model, type = "HC1"))
 ```
 
@@ -407,23 +506,37 @@ This adjusts your confidence in the estimates without changing the model.
 
 If your variable is yes/no (e.g., passed = 1, failed = 0), OLS isn’t right.
 
+Create a new binary variable `high_mpg` that is 1 if mpg is greater than 20 (good fuel efficiency), and 0 otherwise.
 
-```r
+You fit a logistic regression model (´glm´ with `family = binomial`) to predict the probability of high_mpg being 1 based on car weight (wt).
+
+```{r 21}
+
 mtcars$high_mpg <- ifelse(mtcars$mpg > 20, 1, 0)
 logit_model <- glm(high_mpg ~ wt, data = mtcars, family = binomial)
 summary(logit_model)
 ```
 
-OLS might predict -0.2 or 1.3 — but you can't have 130% or -20% success.
+
+**Why not use OLS for this?**
+
+If you tried to fit a linear regression (OLS) on a binary variable like `high_mpg`, the predicted values could be:
+
+- Less than 0 (e.g., -0.2), which makes no sense because probability can’t be negative.
+
+- Greater than 1 (e.g., 1.3), which makes no sense because probability can’t exceed 100%.
+
+OLS doesn't restrict predictions to the 0–1 range, so it can produce invalid probabilities.
 
 Use logistic regression:
 
-```r
+```{r 22}
 logit_model <- glm(high_mpg ~ wt, data = mtcars, family = binomial)
 summary(logit_model)
 ```
 
 Now predictions are between 0 and 1 — perfect for probabilities.
+
 
 ---
 
@@ -433,7 +546,7 @@ In econometrics, robustness checks help us test whether our results are reliable
 
 ### Try Different Specifications
 
-```r
+```{r 23}
 model_alt <- lm(mpg ~ wt + hp, data = mtcars)
 summary(model_alt)
 ```
@@ -452,7 +565,7 @@ We're trying a different specification of the model. Originally, we might have u
 
 ### Try with and without an outlier
 
-```r
+```{r 24}
 model_no_outlier <- lm(mpg ~ wt, data = mtcars[-which.max(mtcars$wt), ])
 summary(model_no_outlier)
 ```
