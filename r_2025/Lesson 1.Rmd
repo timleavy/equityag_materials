@@ -6,59 +6,63 @@ output: html_document
 ---
 
 ## Packages Used
-
 A package is a collection of R functions and datasets designed to make certain tasks easier. You need to install and load a package before using it.
 
--   `arrow` A package that allows R to read and write data in Parquet format, which is a fast and compact way to store data.
+- `arrow`
+A package that allows R to read and write data in Parquet format, which is a fast and compact way to store data.
 
--   `dplyr` A package for data manipulation. It helps you filter, group, summarize, and reshape data using clear, human-readable code.
+- `dplyr`
+A package for data manipulation. It helps you filter, group, summarize, and reshape data using clear, human-readable code.
 
--   `ggplot2` A package for data visualization. It lets you make elegant, customizable charts and graphs.
+- `ggplot2`
+A package for data visualization. It lets you make elegant, customizable charts and graphs.
 
--   `tidyverse` A collection of packages (including dplyr, ggplot2, readr, and more) that work together and follow the same design philosophy for working with data.
+- `tidyverse`
+A collection of packages (including dplyr, ggplot2, readr, and more) that work together and follow the same design philosophy for working with data.
 
-------------------------------------------------------------------------
+---
 
 ## Learning Objectives
+1. Understand the difference between files and objects  
+2. Modify data with good data hygiene practices  
+3. Summarize information from raw data  
+4. Visualize data to convey information  
 
-1.  Understand the difference between files and objects\
-2.  Modify data with good data hygiene practices\
-3.  Summarize information from raw data\
-4.  Visualize data to convey information
-
-------------------------------------------------------------------------
+---
 
 ## Preparing the Workspace
 
 We use **Projects** in RStudio to organize our work. A Project is essentially a folder that keeps everything (scripts, data, outputs) in one place.
 
-To create a new project:\
-- Go to `File > New Project`\
-- Select `New Directory`\
-- Choose `New Project` again\
+To create a new project:  
+- Go to `File > New Project`  
+- Select `New Directory`  
+- Choose `New Project` again  
 - Name the directory (use short, informative names)
 
 The **working directory** is the folder where R looks for files to read and where it saves output files.
 
-An **object** is "container" in R that stores data, like a table or a list of numbers. For example: `merged_data` is an object containing the imported dataset.
+An **object** is "container" in R that stores data, like a table or a list of numbers. For example:
+`merged_data` is an object containing the imported dataset.
 
 A **data frame** is a spreadsheet-like table in R that holds data. It has rows (observations) and columns (variables).
 
 To see your current working directory, use:
 
-``` r
+```r
 getwd()
 ```
 
+
 You can change your working directory using `setwd()`:
 
-``` r
+```r
 setwd("path/to/your/folder")
 ```
 
 For example:
 
-``` r
+```r
 setwd("C:/Users/aljosephson/Dropbox/HSI/data")
 ```
 
@@ -73,7 +77,8 @@ dir.create("output")  # Save visualizations and reports here
 
 ## Importing Data
 
-There are many ways to import data into R. For this lesson, we'll use the arrow package to read Parquet files.
+There are many ways to import data into R.
+For this lesson, we'll use the arrow package to read Parquet files.
 
 Packages in R are collections of functions, code, and sometimes sample data, stored in libraries.
 
@@ -84,6 +89,8 @@ library(arrow)
 ```
 
 `library` loads a package you've already installed so you can use its tools/functions.
+
+
 
 ### Read the data:
 
@@ -98,13 +105,14 @@ merged_data <- read_parquet(file = "merged_data.parquet", stringsAsFactors = TRU
 
 The function `read_parquet()` takes at least two arguments:
 
-1.  The file path to the dataset
+1. The file path to the dataset
 
-2.  How to handle text strings (`stringsAsFactors = TRUE` means treat text as categorical data)
+2. How to handle text strings (`stringsAsFactors = TRUE` means treat text as categorical data)
 
 The data from the file is now stored in an object called `merged_data`.
 
-------------------------------------------------------------------------
+
+---
 
 ## Exploring the Data
 
@@ -116,21 +124,26 @@ tail(merged_data[, 1:10], 6) #show the last 6 rows, 10 first columns
 str(merged_data[, 1:10]) #show structure and variable types, 10 first columns 
 ```
 
-Look out for `NA`, which means missing data in R. Missing data often needs special handling.
+Look out for `NA`, which means missing data in R.
+Missing data often needs special handling.
 
 ## Cleaning Data
 
 Real-world data is rarely clean.
 
-A common cleaning step is removing rows with missing values using `na.omit()`. This
+A common cleaning step is removing rows with missing values using `na.omit()`. This 
 
 Try this carefully:
+
 
 ```{r na-omit-warning}
 merged_data <- na.omit(merged_data)  # This might drop all rows
 ```
 
-But be aware: this might remove too much data if many values are missing! If all rows disappear, it means nearly every row has at least one missing value.
+
+
+But be aware: this might remove too much data if many values are missing!
+If all rows disappear, it means nearly every row has at least one missing value.
 
 Always save a backup of your original data before cleaning:
 
@@ -138,15 +151,19 @@ Always save a backup of your original data before cleaning:
 merged_data <- read_parquet(file = "merged_data.parquet", stringsAsFactors = TRUE)
 ```
 
-------------------------------------------------------------------------
+---
 
 ## Comments and Code Readability
 
-Comments (lines starting with \#) explain what your code does. Good code tells a story to other people (and your future self!). Use comments generously to clarify your steps.
+Comments (lines starting with #) explain what your code does.
+Good code tells a story to other people (and your future self!).
+Use comments generously to clarify your steps.
+
 
 ## Subsetting Data
 
-The dataset has many variables and observations. To focus your analysis, create a subset with just the data you need.
+The dataset has many variables and observations.
+To focus your analysis, create a subset with just the data you need.
 
 For example, to keep only data from Arizona (AZ):
 
@@ -159,36 +176,39 @@ At this point, we can see in the **Environment** tab that our data frame contain
 
 What We've Done So Far:
 
-1.  We've created a list for the state of **Arizona (AZ)**, which will be the focus of our analysis.
-2.  We've created a new variable called `subset_az`, which stores only the data related to AZ.
+1. We've created a list for the state of **Arizona (AZ)**, which will be the focus of our analysis.
+2. We've created a new variable called `subset_az`, which stores only the data related to AZ.
 
-> **Important:**\
-> We have **not modified the original dataset**.\
-> Remember: data are **immutable** – *do not edit your original data*.\
+
+> **Important:**  
+> We have **not modified the original dataset**.  
+> Remember: data are **immutable** – *do not edit your original data*.  
 > We will not have R write to or overwrite any original files.
 
 Why Run Commands Before We Understand Everything?
 
 What we're doing here is building a **practical foundation**, so that when we start talking about scientific computing concepts, you'll already have a bit of hands-on experience to ground your understanding.
 
-------------------------------------------------------------------------
+---
+
+
 
 ## Summarize data:
 
 ```{r summary-az}
 summary(subset_data_az[, 1:10], 6)
 ```
-
 `summary()` gives basic statistics (like min, max, mean, median) for each variable in your dataset.
 
-The `summary()` Function:
+The `summary()` Function: 
 
--   Works on **data frames**, which is how R stores spreadsheet-like data.
--   It provides useful insights:
-    -   For **categorical columns**, it shows the number of rows in each category.
-    -   For **numeric columns**, it gives summary statistics like min, median, mean, etc.
+- Works on **data frames**, which is how R stores spreadsheet-like data.
+- It provides useful insights:
+  - For **categorical columns**, it shows the number of rows in each category.
+  - For **numeric columns**, it gives summary statistics like min, median, mean, etc.
 
 This helps us get a better feel for what's inside the data before moving on to more advanced analysis.
+
 
 ### Understanding the Mean and Standard Deviation
 
@@ -196,16 +216,16 @@ In the code above, we calculated the **mean** and **standard deviation** of upwa
 
 #### What does the **mean** tell us?
 
-The **mean** (or average) is a measure of central tendency, it gives us a single value that summarizes the center point of a dataset.\
+The **mean** (or average) is a measure of central tendency, it gives us a single value that summarizes the center point of a dataset.  
 For example, the mean upward mobility rate in Arizona in 2010 tells us the average level of upward mobility across all observations in that state for that year.
 
 #### What is the **standard deviation**?
 
-The **standard deviation (SD)** is a measure of how spread out the values are around the mean.
+The **standard deviation (SD)** is a measure of how spread out the values are around the mean.  
 
--   A **low SD** means that most values are close to the mean (less variability).
+- A **low SD** means that most values are close to the mean (less variability).
 
--   A **high SD** means that values are more spread out (greater variability).
+- A **high SD** means that values are more spread out (greater variability).
 
 In other words, the SD helps us understand the **consistency** of the data. If two states have the same mean but different standard deviations, the one with a lower SD has more consistent outcomes.
 
@@ -228,7 +248,7 @@ However, the values do not appear in the rendered R Markdown document, because w
 print(upward_mean_2010_az)
 ```
 
-or
+or 
 
 ```{r az-statseasy1}
 upward_mean_2010_az
@@ -260,11 +280,12 @@ print(upward_sd_2020_ca <- sd(subset_data_ca$upward_mobility_rate_2020))
 
 ```
 
-------------------------------------------------------------------------
+---
 
 ### County-Level Summary
 
 You can calculate statistics for smaller groups, such as counties, like this:
+
 
 ```{r pima-county}
 print(pima_upward_mean_2010_az <- mean(subset_data_az$upward_mobility_rate_2010[subset_data_az$COUNTY_2010SVI == "Pima County"]))
@@ -281,13 +302,15 @@ print(delnorte_upward_sd_2010_ca <- sd(subset_data_ca$upward_mobility_rate_2010[
 
 Try this for any county you like!
 
-Remember: R is case-sensitive. If you type a variable or column name wrong (e.g., all lowercase), you might get errors or `NaN` (Not a Number).
+Remember: R is case-sensitive.
+If you type a variable or column name wrong (e.g., all lowercase), you might get errors or `NaN` (Not a Number).
 
-------------------------------------------------------------------------
+---
 
 ## Summary Statistics Using dplyr
 
-Copy-pasting code for many counties or states can get tedious. Luckily, the dplyr package helps us summarize data efficiently.
+Copy-pasting code for many counties or states can get tedious.
+Luckily, the dplyr package helps us summarize data efficiently.
 
 First, install and load `dplyr`:
 
@@ -308,26 +331,29 @@ summary_stats_upward_2010 <- subset_data_az %>%
             sd_mobility_2010_az = sd(upward_mobility_rate_2010))
 ```
 
-The pipe operator %\>% means "then".
+The pipe operator %>% means "then".
 
 If we were to describe this process in words:
 
--   Make a new variable called `summary_stats_upward_2010`.
--   Take the data for Arizona (`subset_data_az`), then:
-    -   **Group** the data by county (`COUNTY_2010SVI`), then:
-    -   For each county, **calculate** the mean and standard deviation of `upward_mobility_rate_2010`.
+- Make a new variable called `summary_stats_upward_2010`.
+- Take the data for Arizona (`subset_data_az`), then:
+  - **Group** the data by county (`COUNTY_2010SVI`), then:
+  - For each county, **calculate** the mean and standard deviation of `upward_mobility_rate_2010`.
+
 
 `group_by()` splits your data into groups (like by state or county).
 
 `summarize()` then applies functions like mean() or sd() to each group.
 
+
+
 You can view the result with:
 
-``` r
+```r
 (head(summary_stats_upward_2010))
 ```
 
-------------------------------------------------------------------------
+---
 
 ## Visualization with ggplot2
 
@@ -351,6 +377,10 @@ library(ggplot2)
 
 `geom_boxplot()` adds a boxplot, which shows the spread and center of your data.
 
+
+
+
+
 Let’s create a `boxplot` to compare upward mobility between counties in Arizona:
 
 ```{r plot-az}
@@ -360,10 +390,11 @@ mobility_plot <- ggplot(data = summary_stats_upward_2010,
 print(mobility_plot)
 ```
 
-Boxplots are great for comparing values across **categories** (like counties).\
+
+Boxplots are great for comparing values across **categories** (like counties).  
 However, with even 15 counties, the plot may start to look a bit crowded.
 
-------------------------------------------------------------------------
+---
 
 ### State and County Summary
 
@@ -393,8 +424,8 @@ Let’s take a closer look at the code we use to create graphs with `ggplot2`.
 
 The main function for plotting is `ggplot()`. It requires two key pieces of information:
 
-1.  **Data** — which dataset we want to visualize.
-2.  **Mapping** — how to map variables in our data to the axes and other visual properties (like color or shape).
+1. **Data** — which dataset we want to visualize.
+2. **Mapping** — how to map variables in our data to the axes and other visual properties (like color or shape).
 
 In our example, we want to plot a `boxplot`, so we specify the type of plot with `geom_boxplot()`.
 
@@ -402,13 +433,14 @@ Finally, we print the graph to the console with the `print()` command, or simply
 
 We also often save the plot to a variable (e.g., `mobility_plot`) so we can reuse or modify it easily.
 
-------------------------------------------------------------------------
+---
 
 We have missing states, let's remove that:
 
 ```{r remove-na-states}
 summary_stats_upward_2010_all <- summary_stats_upward_2010_all[!is.na(summary_stats_upward_2010_all$STATE_ABBR_2010SVI),]
 ```
+
 
 Let’s now use this expanded dataset to create a boxplot, this time grouped by **state**:
 
@@ -426,30 +458,32 @@ Save the plot:
 ggsave(plot = mobility_plot, filename = "output/mobility-plot-2010.pdf")
 ```
 
-------------------------------------------------------------------------
+---
 
 # Review of Learning Objectives
 
-✅ Understand the difference between files and objects\
-✅ Modify data with data hygiene principles\
-✅ Summarize information from raw data\
+✅ Understand the difference between files and objects  
+✅ Modify data with data hygiene principles  
+✅ Summarize information from raw data  
 ✅ Visualize data to convey information
 
-------------------------------------------------------------------------
+---
 
 In our next lesson, we will build on these skills and begin working with **scientific computing** concepts.
+
 
 ## Student Activities
 
 Follow these tasks using the skills from Lesson 1.
 
-------------------------------------------------------------------------
+---
 
 ### 1. Explore a different county from AZ or CA
 
--   Choose one county from Arizona or California, do not choose Pima County or Del Norte County
--   Calculate the **mean** and **standard deviation** of `upward_mobility_rate_2010` and `upward_mobility_rate_2020`.
--   Compare your results with the average of the state selected
+- Choose one county from Arizona or California, do not choose Pima County or Del Norte County
+- Calculate the **mean** and **standard deviation** of `upward_mobility_rate_2010` and `upward_mobility_rate_2020`.
+- Compare your results with the average of the state selected
+
 
 Use the following code to see which counties are included in the Arizona and California subsets:
 
@@ -461,41 +495,43 @@ table(subset_data_az$COUNTY_2010SVI)
 table(subset_data_ca$COUNTY_2010SVI)
 ```
 
-------------------------------------------------------------------------
+
+
+---
 
 ### 2. Boxplot Selected County
 
--   Using the county you chose in Task 1, create two boxplots using `ggplot2`:
+- Using the county you chose in Task 1, create two boxplots using `ggplot2`:
+  - One for `upward_mobility_rate_2010`
+  - One for `upward_mobility_rate_2020`
+- Compare the distributions between the two years.
 
-    -   One for `upward_mobility_rate_2010`
-    -   One for `upward_mobility_rate_2020`
+- Are there any outliers?
 
--   Compare the distributions between the two years.
+- Save the plot
 
--   Are there any outliers?
-
--   Save the plot
-
-------------------------------------------------------------------------
+---
 
 ### 3. Filter Challenge
 
--   Using the **state dataset** (either `subset_data_az` or `subset_data_ca`), filter the data to **only include rows where `upward_mobility_rate_2010` is greater than 1**.
--   How many rows meet that condition?
--   Do you notice any patterns in which counties appear?
+- Using the **state dataset** (either `subset_data_az` or `subset_data_ca`), filter the data to **only include rows where `upward_mobility_rate_2010` is greater than 1**.
+- How many rows meet that condition?
+- Do you notice any patterns in which counties appear?
 
-**Hint:** Use the `filter()` function from the `dplyr` package.\
+**Hint:** Use the `filter()` function from the `dplyr` package.  
 Here’s a reminder of the syntax:
 
-You’ll need to "pipe" (%\>%) your dataset into this function and provide the condition inside. To count the number of rows, try using nrow() after the filtering step.
+You’ll need to "pipe" (%>%) your dataset into this function and provide the condition inside.
+To count the number of rows, try using nrow() after the filtering step.
 
-------------------------------------------------------------------------
+---
 
 ### 4. Reflect and Extend
 
 Take a moment to think beyond the instructions.
 
-a.  What question would *you* design based on this lesson? *(e.g., “Is mobility higher in counties with lower poverty rates?”)*
+a. What question would *you* design based on this lesson?
+*(e.g., “Is mobility higher in counties with lower poverty rates?”)*
 
-b.  What questions do you still have?\
-    *(What was confusing? What would you like to dive deeper into next time?)*
+b. What questions do you still have?  
+*(What was confusing? What would you like to dive deeper into next time?)*

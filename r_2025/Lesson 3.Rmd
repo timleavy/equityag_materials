@@ -129,6 +129,7 @@ Let’s remove such entries:
 
 ```{r remove-anomalies}
 merged_data <- merged_data[!(merged_data$STATE_NAME_2010SVI %in% "06"), ]
+```
 
 Re-plot the boxplot to confirm the issue is resolved:
 

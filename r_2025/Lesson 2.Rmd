@@ -279,7 +279,7 @@ Pick a place on your computer where you want to save the project files.
 
 This is your local copy — your working area!
 
-#### **Step 6: Click “Create Project”3**
+#### **Step 6: Click “Create Project”**
 RStudio will now create a new project folder and link it to your GitHub repo. You’ll now see:
 - A new RStudio session open
 - A Git tab in the top right (this means it's connected!)
