@@ -6,3 +6,5 @@ date: "2025-07-14"
 # List counties in Arizona
 table(subset_data_az$COUNTY_2010SVI)
 
+# load packages
+
