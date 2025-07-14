@@ -1,9 +1,9 @@
 {
     "id": "BC705313",
-    "path": "C:/Users/ual-laptop/Desktop/GitHub Folder/equityag_materials/Leavy_L.1.Rmd",
-    "project_path": "Leavy_L.1.Rmd",
+    "path": "C:/Users/ual-laptop/Desktop/UCSB Ag Workshop/Leavy_L.1_Real.Rmd",
+    "project_path": null,
     "type": "r_markdown",
-    "hash": "3560953821",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1752531619291.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "5,1",
-        "scrollLine": "0"
+        "cursorPosition": "150,0",
+        "scrollLine": "145"
     },
     "folds": "",
-    "lastKnownWriteTime": 1752531634,
+    "lastKnownWriteTime": 1752535895,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1752531634437,
+    "last_content_update": 1752535895981,
     "read_only": false,
     "read_only_alternatives": []
 }
