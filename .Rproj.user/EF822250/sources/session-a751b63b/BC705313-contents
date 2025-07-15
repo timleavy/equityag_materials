@@ -154,4 +154,41 @@ library(dplyr)
 
 table(subset_data_az$coconino_2010SVI)
 
+alpine_county_data <- subset_data_ca %>% filter(COUNTY_2010SVI == "Alpine County")
+
+# plot alpine county 2010
+mobility_plot1 <- ggplot(data = alpine_county_data,
+                        mapping = aes(x= COUNTY_2010SVI, y=upward_mobility_rate_2010,
+                                      fill = COUNTY_2010SVI)) +
+  geom_boxplot()
+print(mobility_plot1)
+
+#filter challenge
+
+upward_mobility_az <- subset_data_az %>% filter(upward_mobility_rate_2010 > 1)
+
+#count rows meeting condition
+
+num_rows <- nrow(upward_mobility_az > 1)
+
+#plot counties > 1
+
+
+#chain 
+upward_mobility_az <- subset_data_az %>%
+  filter(upward_mobility_rate_2010 > 1)
+  
+  
+#plot 
+
+ggplot(upward_mobility_az, aes(x = reorder(COUNTY_2010SVI, upward_mobility_rate_2010), 
+                               y = upward_mobility_rate_2010)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +  # optional: flips axes for readability
+  labs(title = "Counties in AZ with Upward Mobility Rate > 1 (2010)",
+       x = "County",
+       y = "Upward Mobility Rate (2010)") +
+  theme_minimal()
+
+
 
