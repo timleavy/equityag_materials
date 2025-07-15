@@ -149,5 +149,9 @@ ggsave(plot = mobility_plot, filename = "output/mobility-plot-2010.pdf)
 
 table(subset_data_az$COUNTY_2010SVI)
 
+library(ggplot2)
+library(dplyr)
+
+table(subset_data_az$coconino_2010SVI)
 
 

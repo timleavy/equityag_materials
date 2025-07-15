@@ -3,24 +3,24 @@
     "path": "C:/Users/ual-laptop/Desktop/UCSB Ag Workshop/Leavy_L.1_Real.Rmd",
     "project_path": null,
     "type": "r_markdown",
-    "hash": "0",
+    "hash": "3908832504",
     "contents": "",
-    "dirty": false,
+    "dirty": true,
     "created": 1752531619291.0,
     "source_on_save": false,
     "relative_order": 3,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "150,0",
-        "scrollLine": "145"
+        "cursorPosition": "156,0",
+        "scrollLine": "148"
     },
     "folds": "",
     "lastKnownWriteTime": 1752535895,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1752535895981,
+    "last_content_update": 1752556787929,
     "read_only": false,
     "read_only_alternatives": []
 }
