@@ -189,6 +189,10 @@ ggplot(upward_mobility_az, aes(x = reorder(COUNTY_2010SVI, upward_mobility_rate_
        x = "County",
        y = "Upward Mobility Rate (2010)") +
   theme_minimal()
+  
+#day 2 Lab.2
+
+
 
 
 
