@@ -227,3 +227,215 @@ sink()
 #Student Activity- variable exploration, 
 #Pick a variable from the environment section and make a box plot to explore it. 
 
+#Filter for Arizona
+
+az <- merged_data[merged_data$STATE_NAME_2010SVI == "Arizona", ]
+
+# Filter for Arizona
+az <- merged_data[merged_data$STATE_NAME_2010SVI == "Arizona", ]
+
+# Boxplot: Median Household Income by County in Arizona
+
+# Filter for Arizona
+az <- merged_data[merged_data$STATE_NAME_2010SVI == "Arizona", ]
+
+# Boxplot: Median Household Income by County in Arizona
+boxplot(M_HH_INC_2010SVI ~ COUNTY_2010SVI,
+        data = az,
+        main = "Median Household Income by County in Arizona (2010)",
+        xlab = "County",
+        ylab = "Median Household Income (2010)",
+        las = 2,           # rotate axis labels
+        cex.axis = 0.7)    # shrink axis text for better fit
+
+boxplot(HH_INC_2010SVI ~ COUNTY_2010SVI,
+        data = az,
+        main = "Median Household Income by County in Arizona (2010)",
+        xlab = "County",
+        ylab = "Median Household Income (2010)",
+        las = 2,
+        cex.axis = 0.7)
+#searching for correct data to pinpoint HH median in AZ
+names(merged_data)
+
+grep("median", names(merged_data), value = TRUE, ignore.case = TRUE)
+
+
+# Boxplot: Median Family Income (2019) by County in Arizona
+boxplot(MedianFamilyIncome_FOODACCESS_2019 ~ COUNTY_2010SVI,
+        data = az,
+        main = "Median Family Income by County in Arizona (2019)",
+        xlab = "County",
+        ylab = "Median Family Income (2019)",
+        las = 2,           # rotate axis labels
+        cex.axis = 0.7)    # shrink axis text for better fit
+#same thing but for CA this time
+
+ca <- merged_data %>% 
+  filter(STATE_NAME_2010SVI == "California")
+
+ggplot(data = ca, aes(x = COUNTY_2010SVI, y = MedianFamilyIncome_FOODACCESS_2019)) +
+  geom_boxplot(fill = "skyblue") +
+  labs(title = "Median Family Income by County in California (2019)",
+       x = "County",
+       y = "Median Family Income (2019)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1, size = 8))
+
+# 2020 mobility data. Adding more variables into the regression. Using 2020
+
+grep("upward", names(merged_data), value = TRUE, ignore.case = TRUE)
+
+grep("MedianFamilyIncome", names(merged), value = TRUE)
+
+merged$MedianFamilyIncome_FOODACCESS_2019 <- merged_data$MedianFamilyIncome_FOODACCESS_2019
+merged <- merged_data
+
+# Filter out rows with missing data in any relevant variable
+model_data <- merged %>%
+  filter(!is.na(upward_mobility_rate_2020),
+         !is.na(logpop),
+         !is.na(az),
+         !is.na(ca),
+         !is.na(MedianFamilyIncome_FOODACCESS_2019),
+         !is.na(PCT_NOVEH_2010SVI))
+
+# Run linear regression model
+mobility_2020_model <- lm(upward_mobility_rate_2020 ~ 
+                            logpop + az + ca +
+                            MedianFamilyIncome_FOODACCESS_2019 +
+                            PCT_NOVEH_2010SVI,
+                          data = model_data)
+
+# View model output
+summary(mobility_2020_model)
+
+#re-running code for mobility 2020
+
+mobility_2020_model <- lm(upward_mobility_rate_2020 ~ 
+                            logpop + az + ca +
+                            MedianFamilyIncome_FOODACCESS_2019 +
+                            PCT_NOVEH_2010SVI,
+                          data = model_data)
+
+model_data <- merged %>%
+  filter(!is.na(upward_mobility_rate_2020),
+         !is.na(logpop),
+         !is.na(az),
+         !is.na(ca),
+         !is.na(MedianFamilyIncome_FOODACCESS_2019),
+         !is.na(PCT_NOVEH_2010SVI))
+names(merged)
+
+model_data <- merged %>%
+  filter(!is.na(upward_mobility_rate_2020),
+         !is.na(logpop),
+         !is.na(az),
+         !is.na(ca),
+         !is.na(MedianFamilyIncome_FOODACCESS_2019),
+         !is.na(PCT_NOVEH_2010SVI))
+
+merged$logpop <- log10(merged$M_TOTPOP_2010SVI)
+
+summary(merged$M_TOTPOP_2010SVI)
+
+# Option 1: Replace 0s with NA before taking log
+merged$M_TOTPOP_2010SVI[merged$M_TOTPOP_2010SVI == 0] <- NA
+
+# Then safely take log
+merged$logpop <- log10(merged$M_TOTPOP_2010SVI)
+
+filter(!is.na(upward_mobility_rate_2020),
+       !is.na(logpop),
+       !is.na(az),
+       !is.na(ca),
+       !is.na(MedianFamilyIncome_FOODACCESS_2019),
+       !is.na(PCT_NOVEH_2010SVI))
+
+merged$M_TOTPOP_2010SVI[merged$M_TOTPOP_2010SVI == 0] <- NA
+#log-transformed population
+merged$logpop <- log10(merged$M_TOTPOP_2010SVI)
+#removing zeros before taking the log
+merged$M_TOTPOP_2010SVI[merged$M_TOTPOP_2010SVI == 0] <- NA
+
+
+#now applying the log
+merged$logpop <- log10(merged$M_TOTPOP_2010SVI)
+
+summary(merged$logpop)
+
+model_data <- merged %>%
+  filter(!is.na(upward_mobility_rate_2020),
+         !is.na(logpop),
+         !is.na(az),
+         !is.na(ca),
+         !is.na(MedianFamilyIncome_FOODACCESS_2019),
+         !is.na(PCT_NOVEH_2010SVI))
+#making the rows the same length
+merged$az <- ifelse(merged$STATE_NAME_2010SVI == "Arizona", 1, 0)
+merged$ca <- ifelse(merged$STATE_NAME_2010SVI == "California", 1, 0)
+
+model_data <- merged %>%
+  filter(!is.na(upward_mobility_rate_2020),
+         !is.na(logpop),
+         !is.na(az),
+         !is.na(ca),
+         !is.na(MedianFamilyIncome_FOODACCESS_2019),
+         !is.na(PCT_NOVEH_2010SVI))
+grep("NOVEH", names(merged_data), value = TRUE)
+
+
+merged <- merged_data
+
+#replacing all zero population with NA to avoid log10 errors
+
+merged$M_TOTPOP2010SVI[merged$M_TOTPOP_2010SVI ==0] <- NA
+
+#create log transformed population
+merged$logpop <- log10(merged$M_TOTPOP_2010SVI)
+
+#stating dummy variables
+
+merged$az <- ifelse(merged$STATE_NAME_2010SVI == "Arizona", 1,0)
+
+merged$az <- ifelse(merged$STATE_NAME_2010SVI == "California", 1, 0) 
+
+merged$PCT_NOVEH_2010SVI <- merged_data$M_P_NOVEH_2010SVI
+
+model_data <- merged %>%
+  filter(!is.na(upward_mobility_rate_2020),
+         !is.na(logpop),
+         !is.na(az),
+         !is.na(ca),
+         !is.na(MedianFamilyIncome_FOODACCESS_2019),
+         !is.na(PCT_NOVEH_2010SVI))
+
+mobility_2020_model <- lm(upward_mobility_rate_2020 ~ 
+                            logpop + az + ca +
+                            MedianFamilyIncome_FOODACCESS_2019 +
+                            PCT_NOVEH_2010SVI,
+                          data = model_data)
+
+summary(mobility_2020_model)
+
+#adding predicted values to the data
+
+model_data$predicted_mobility <- predict(mobility_2020_model)
+
+library(ggplot2)
+
+ggplot(model_data, aes(x = predicted_mobility, y = upward_mobility_rate_2020)) +
+  geom_point(alpha = 0.6, color = "steelblue") +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
+  labs(title = "Predicted vs. Actual Upward Mobility (2020)",
+       x = "Predicted Mobility",
+       y = "Actual Mobility") +
+  theme_minimal()
+
+# Self-reflection
+#I need help troubleshooting errors on my own.
+#Honestly, I leaned really heavily on gpt to put this all together
+#but I learned a lot about NaN values and what those warning messages meant
+#I definitely still need more understanding of the code itself and 
+#what it is I'm actually doing. I understand this is a really powerful tool, but
+#it's just not quite in my grasp YET!
