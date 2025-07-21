@@ -1,0 +1,198 @@
+---
+title: "Leavy_L.1"
+output: html_document
+---
+# load package
+library(arrow)
+
+---
+
+# load data
+merged_data<-read_parquet(file="merged_data.parquet",stringsAsFactors=TRUE)
+
+---
+
+# top and bottom of data
+head(merged_data[,1:10],6)
+tail(merged_data[,1:10],6)
+str(merged_data[, 1:10])
+
+---
+
+# cleaning the data
+merged_data <- na.omit(merged_data)
+
+
+
+---
+
+# load data
+merged_data<-read_parquet(file="merged_data.parquet",stringsAsFactors=TRUE)
+
+---
+
+subset_data_az <- subset(merged_data, STATE_ABBR_2010SVI == "AZ")
+
+---
+
+summary(subset_data_az[, 1:10], 6)
+
+
+---
+
+# calculating mean and sd for upward mobility,AZ
+
+upward_mean_2010_az <- mean(subset_data_az$upward_mobility_rate_2010)
+---
+upward_sd_2010_az <- sd(subset_data_az$upward_mobility_rate_2010)
+---
+upward_mean_2020_az <- mean(subset_data_az$upward_mobility_rate_2020)
+---
+upward_sd_2020_az <- sd(subset_data_az$upward_mobility_rate_2020)
+---
+# prints
+
+print(upward_mean_2010_az <- mean(subset_data_az$upward_mobility_rate_2010))
+
+print(upward_sd_2010_az <- sd(subset_data_az$upward_mobility_rate_2010))
+
+print(upward_mean_2020_az <- mean(subset_data_az$upward_mobility_rate_2020))
+
+print(upward_sd_2020_az <- sd(subset_data_az$upward_mobility_rate_2020))
+
+# calculating for ca
+
+subset_data_ca <- subset(merged_data, STATE_ABBR_2010SVI == "CA")
+
+print(upward_mean_2010_ca <- mean(subset_data_ca$upward_mobility_rate_2010))
+
+print(upward_sd_2010_ca <- sd(subset_data_ca$upward_mobility_rate_2010))
+
+print(upward_mean_2020_ca <- mean(subset_data_ca$upward_mobility_rate_2020))
+
+print(upward_sd_2020_ca <- sd(subset_data_ca$upward_mobility_rate_2020))
+---
+
+# stats pima county
+print(pima_upward_mean_2010_az <- mean(subset_data_az$upward_mobility_rate_2010[subset_data_az$COUNTY_2010SVI == "Pima County"]))
+
+print(pima_upward_sd_2010_az <- sd(subset_data_az$upward_mobility_rate_2010[subset_data_az$COUNTY_2010SVI == "Pima County"]))
+
+# stats coconino county
+
+print(coconino_upward_mean_2010_az <- mean(subset_data_az$upward_mobility_rate_2010[subset_data_az$COUNTY_2010SVI == "Coconino County"]))
+
+print(coconino_upward_sd_2010_az <- sd(subset_data_az$upward_mobility_rate_2010[subset_data_az$COUNTY_2010SVI == "Coconino County"]))
+
+# stats del norte
+print(delnorte_upward_mean_2010_ca <- mean(subset_data_ca$upward_mobility_rate_2010[subset_data_ca$COUNTY_2010SVI == "Del Norte County"]))
+
+print(delnorte_upward_sd_2010_ca <- sd(subset_data_ca$upward_mobility_rate_2010[subset_data_ca$COUNTY_2010SVI == "Del Norte County"]))
+
+# stats alpine county
+
+print(alpine_upward_mean_2010_ca <- mean(subset_data_ca$upward_mobility_rate_2010[subset_data_ca$COUNTY_2010SVI == "Alpine County"]))
+
+print(alpine_upward_sd_2010_ca <- sd(subset_data_ca$upward_mobility_rate_2010[subset_data_ca$COUNTY_2010SVI == "Alpine County"]))
+
+---
+# installing dyplr
+
+install.packages("dplyr")
+
+library(dplyr)
+
+summary_stats_upward_2010 <- subset_data_az %>%
+  group_by(COUNTY_2010SVI) %>%
+  summarize(mean_mobility_2010_az = mean(upward_mobility_rate_2010),
+            sd_mobility_2010_az = sd(upward_mobility_rate_2010))
+
+(head(summary_stats_upward_2010))
+
+# installing ggplot
+
+install.packages("ggplot2")
+
+library(ggplot2)
+
+# data visualization 
+#---box plot---
+
+mobility_plot <- ggplot(data = summary_stats_upward_2010,
+                        mapping = aes(x= COUNTY_2010SVI, y=mean_mobility_2010_az)) +
+  geom_boxplot()
+print(mobility_plot)
+
+# summary of state and county
+
+summary_stats_upward_2010_all <- merged_data %>%
+  group_by(STATE_ABBR_2010SVI, COUNTY_2010SVI) %>%
+  summarize(mean_mobility_2010 = mean(upward_mobility_rate_2010),
+            sd_mobility_2010 = sd(upward_mobility_rate_2010))
+
+# state boxplot
+
+mobility_plot <- ggplot(data = summary_stats_upward_2010_all,
+                        mapping = aes(x = STATE_ABBR_2010SVI, y = mean_mobility_2010)) +
+  geom_boxplot()
+print(mobility_plot)
+
+summary_stats_upward_2010_all <- summary_stats_upward_2010_all[!is.na(summary_stats_upward_2010_all$STATE_ABBR_2010SVI),]
+
+mobility_plot <- ggplot(data = summary_stats_upward_2010_all,
+mapping = aes(x= STATE_ABBR_2010SVI, y=mean_mobility_2010, fill = STATE_ABBR_2010SVI)) + geom_boxplot()
+print(mobility_plot)
+
+ggsave(plot = mobility_plot, filename = "output/mobility-plot-2010.pdf)
+
+# CA and AZ counties are above this with Pima and Del Norte calculations
+
+table(subset_data_az$COUNTY_2010SVI)
+
+library(ggplot2)
+library(dplyr)
+
+table(subset_data_az$coconino_2010SVI)
+
+alpine_county_data <- subset_data_ca %>% filter(COUNTY_2010SVI == "Alpine County")
+
+# plot alpine county 2010
+mobility_plot1 <- ggplot(data = alpine_county_data,
+                        mapping = aes(x= COUNTY_2010SVI, y=upward_mobility_rate_2010,
+                                      fill = COUNTY_2010SVI)) +
+  geom_boxplot()
+print(mobility_plot1)
+
+#filter challenge
+
+upward_mobility_az <- subset_data_az %>% filter(upward_mobility_rate_2010 > 1)
+
+#count rows meeting condition
+
+num_rows <- nrow(upward_mobility_az > 1)
+
+#plot counties > 1
+
+
+#chain 
+upward_mobility_az <- subset_data_az %>%
+  filter(upward_mobility_rate_2010 > 1)
+  
+  
+#plot 
+
+ggplot(upward_mobility_az, aes(x = reorder(COUNTY_2010SVI, upward_mobility_rate_2010), 
+                               y = upward_mobility_rate_2010)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +  # optional: flips axes for readability
+  labs(title = "Counties in AZ with Upward Mobility Rate > 1 (2010)",
+       x = "County",
+       y = "Upward Mobility Rate (2010)") +
+  theme_minimal()
+  
+#day 2 Lab.2
+
+
+
+
+
