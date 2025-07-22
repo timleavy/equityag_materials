@@ -1,0 +1,33 @@
+#installing packages
+
+install.packages("arrow")
+install.packages("tidyverse")
+library(tidyverse)
+library(arrow)
+
+
+merged_data <- read_parquet(file = "merged_data.parquet", stringsAsFactors = TRUE)
+
+library(dplyr)
+
+drinking_water_data <- merged_data %>%
+        filter(use_type == "Drinking Water")
+
+library(dplyr)
+
+drinking_water_data <- merged_data %>%
+  filter(use_type == "Drinking Water")
+
+"C:/Users/ual-laptop/Desktop/merged.data.csv"
+
+merged_data_cal_enviro <- read.csv ("../../merged_data.csv")
+
+library(dplyr)
+
+selected_df <- merged_data_cal_enviro %>%
+  select(`geo2010`, ends_with("_CALENV"))
+
+
+
+fertilizer_total_use <- read.csv ("../../fertilizer-total-use.csv")
+
